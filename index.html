@@ -560,6 +560,7 @@
         @keyframes loading {
             to { transform: rotate(360deg); }
         }
+        /* 修改弹窗样式 - 支持长图滚动和缩放 */
         .img-modal {
             position: fixed;
             top: 0;
@@ -569,11 +570,12 @@
             background-color: rgba(0,0,0,0.92);
             z-index: 9999;
             display: none;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 20px;
             opacity: 0;
             transition: opacity 0.3s ease;
+            overflow: auto; /* 允许弹窗滚动 */
         }
         .img-modal.active {
             display: flex;
@@ -581,20 +583,41 @@
         }
         .modal-content {
             max-width: 95%;
-            max-height: 95%;
+            max-height: 95vh; /* 修改为视口高度的95% */
+            margin: auto; /* 居中显示 */
             transform: scale(0.95);
             transition: transform 0.3s ease;
+            position: relative;
+            cursor: grab; /* 拖拽光标 */
+        }
+        .modal-content.grabbing {
+            cursor: grabbing; /* 拖拽中光标 */
         }
         .img-modal.active .modal-content {
             transform: scale(1);
         }
         .modal-img {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 95vh; /* 限制最大高度 */
             object-fit: contain;
             display: block;
             border-radius: 8px;
             box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
+        }
+        /* 缩放控制提示 */
+        .zoom-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            z-index: 10001;
+            backdrop-filter: blur(4px);
         }
         .close-modal {
             position: fixed;
@@ -650,7 +673,12 @@
             }
             .modal-content {
                 max-width: 98%;
-                max-height: 90%;
+                max-height: 90vh;
+            }
+            .zoom-hint {
+                font-size: 12px;
+                padding: 6px 12px;
+                bottom: 20px;
             }
         }
 
@@ -864,7 +892,9 @@
     <!-- 图片弹窗（查看完整图） -->
     <div class="img-modal" id="imgModal">
         <span class="close-modal" id="closeModal">&times;</span>
-        <div class="modal-content">
+        <!-- 新增缩放提示 -->
+        <div class="zoom-hint">滚轮缩放 / 拖拽查看</div>
+        <div class="modal-content" id="modalContent">
             <img src="" alt="完整作品图" class="modal-img" id="modalImg" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmNSIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJjb250cm9sIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7nlLXlv4Mg5Zu+54mHPC90ZXh0Pjwvc3ZnPg=='">
         </div>
     </div>
@@ -954,7 +984,7 @@
 
         startSlideInterval();
 
-        // 2. 智能画廊
+        // 2. 智能画廊 - 优化版本
         const imageCategories = [
             { prefix: 'electric', name: '电动出行工具' },
             { prefix: 'home', name: '家居家电' },
@@ -962,15 +992,17 @@
             { prefix: '3c', name: '3C数码' }
         ];
         const imageFormats = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-        const maxImageNumber = 100;
-        const batchSize = 20;
+        const maxImageNumber = 20; // 减少检查数量，提升性能
+        const batchSize = 10;
         const galleryContainer = document.getElementById('petalGallery');
         const galleryLoading = document.getElementById('galleryLoading');
         const galleryEmpty = document.getElementById('galleryEmpty');
+        const imageBasePath = ''; // 图片基础路径，如有需要改为 'images/' 或 'gallery/'
         let loadedImages = [];
         let sortedImages = [];
 
-        function checkImageExists(url, timeout = 3000) {
+        // 优化的图片存在性检测 - 并行检测
+        async function checkImageExists(url, timeout = 1000) {
             return new Promise((resolve) => {
                 const img = new Image();
                 const timer = setTimeout(() => resolve(false), timeout);
@@ -987,6 +1019,46 @@
                 
                 img.src = url;
             });
+        }
+
+        // 批量检测图片
+        async function batchCheckImages(category) {
+            const promises = [];
+            const imageUrls = [];
+            
+            // 生成所有可能的图片URL
+            for (let i = 1; i <= maxImageNumber; i++) {
+                for (const format of imageFormats) {
+                    const imageUrl = `${imageBasePath}${category.prefix}${i}.${format}`;
+                    imageUrls.push({ url: imageUrl, number: i });
+                    promises.push(checkImageExists(imageUrl));
+                }
+            }
+            
+            // 并行检测所有图片
+            const results = await Promise.all(promises);
+            const categoryImages = [];
+            
+            // 处理检测结果
+            for (let i = 0; i < results.length; i++) {
+                if (results[i]) {
+                    const { url, number } = imageUrls[i];
+                    if (!loadedImages.includes(url)) {
+                        loadedImages.push(url);
+                        const imageDesc = generateImageDescription(category.prefix, number, category.name);
+                        categoryImages.push({
+                            url: url,
+                            desc: imageDesc,
+                            category: category.prefix,
+                            number: number
+                        });
+                        // 每个编号只取第一个可用格式
+                        break;
+                    }
+                }
+            }
+            
+            return categoryImages;
         }
 
         function generateImageDescription(prefix, number, categoryName) {
@@ -1035,39 +1107,15 @@
             return galleryItem;
         }
 
-        async function loadCategoryImages(category) {
-            const categoryImages = [];
-            
-            for (let i = 1; i <= maxImageNumber; i++) {
-                for (const format of imageFormats) {
-                    const imageUrl = `${category.prefix}${i}.${format}`;
-                    const exists = await checkImageExists(imageUrl);
-                    if (exists && !loadedImages.includes(imageUrl)) {
-                        loadedImages.push(imageUrl);
-                        const imageDesc = generateImageDescription(category.prefix, i, category.name);
-                        categoryImages.push({
-                            url: imageUrl,
-                            desc: imageDesc,
-                            category: category.prefix,
-                            number: i
-                        });
-                        break;
-                    }
-                }
-            }
-            
-            return categoryImages;
-        }
-
-        function renderImagesInBatches(images, batchSize = 20) {
+        function renderImagesInBatches(images, batchSize = 10) {
             let index = 0;
             
             function renderBatch() {
                 const batch = images.slice(index, index + batchSize);
                 if (batch.length === 0) {
                     galleryLoading.style.display = 'none';
-                    // 延迟初始化弹窗，确保元素已渲染
-                    setTimeout(initGalleryModal, 100);
+                    // 无论是否有图片都初始化弹窗
+                    initGalleryModal();
                     return;
                 }
                 
@@ -1084,52 +1132,84 @@
         }
 
         async function loadAllGalleryImages() {
-            galleryLoading.textContent = '正在加载作品图片...';
-            sortedImages = [];
-            
-            for (const category of imageCategories) {
-                const categoryImages = await loadCategoryImages(category);
-                sortedImages = sortedImages.concat(categoryImages);
-            }
-            
-            sortedImages.sort((a, b) => {
-                if (a.category === b.category) {
-                    return a.number - b.number;
+            try {
+                galleryLoading.textContent = '正在加载作品图片...';
+                sortedImages = [];
+                
+                // 并行加载所有分类的图片
+                const categoryPromises = imageCategories.map(category => batchCheckImages(category));
+                const categoryResults = await Promise.all(categoryPromises);
+                
+                // 合并结果
+                categoryResults.forEach(images => {
+                    sortedImages = sortedImages.concat(images);
+                });
+                
+                // 排序
+                sortedImages.sort((a, b) => {
+                    if (a.category === b.category) {
+                        return a.number - b.number;
+                    }
+                    return imageCategories.findIndex(c => c.prefix === a.category) - imageCategories.findIndex(c => c.prefix === b.category);
+                });
+                
+                galleryLoading.style.display = 'none';
+                
+                if (sortedImages.length === 0) {
+                    galleryEmpty.style.display = 'block';
+                    // 即使没有图片也初始化弹窗
+                    initGalleryModal();
+                } else {
+                    renderImagesInBatches(sortedImages, batchSize);
                 }
-                return imageCategories.findIndex(c => c.prefix === a.category) - imageCategories.findIndex(c => c.prefix === b.category);
-            });
-            
-            galleryLoading.style.display = 'none';
-            
-            if (sortedImages.length === 0) {
+            } catch (error) {
+                console.error('加载画廊图片出错:', error);
+                galleryLoading.style.display = 'none';
+                galleryEmpty.textContent = '加载图片时出错，请刷新页面重试';
                 galleryEmpty.style.display = 'block';
-            } else {
-                renderImagesInBatches(sortedImages, batchSize);
+                initGalleryModal();
             }
         }
 
-        // 3. 画廊弹窗功能
+        // 3. 画廊弹窗功能 - 优化长图查看体验
         function initGalleryModal() {
             const galleryItems = document.querySelectorAll('.gallery-item');
-            if (galleryItems.length === 0) return;
-            
             const imgModal = document.getElementById('imgModal');
             const modalImg = document.getElementById('modalImg');
+            const modalContent = document.getElementById('modalContent');
             const closeModal = document.getElementById('closeModal');
+            
+            // 缩放和拖拽相关变量
+            let scale = 1;
+            let isDragging = false;
+            let startX, startY;
+            let translateX = 0, translateY = 0;
+            let lastTranslateX = 0, lastTranslateY = 0;
+            const minScale = 0.5;
+            const maxScale = 3;
 
             galleryItems.forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
                     const imgSrc = item.getAttribute('data-img');
-                    const imgAlt = item.querySelector('.gallery-img').alt;
+                    const imgAlt = item.querySelector('.gallery-img')?.alt || '作品图片';
                     
-                    modalImg.src = '';
-                    modalImg.alt = '';
+                    // 重置缩放和位移
+                    scale = 1;
+                    translateX = 0;
+                    translateY = 0;
+                    lastTranslateX = 0;
+                    lastTranslateY = 0;
+                    
+                    // 重置图片样式
+                    modalImg.style.transform = '';
+                    modalContent.style.transform = 'scale(1)';
+                    
                     modalImg.src = getPlaceholderImage();
+                    modalImg.alt = imgAlt;
                     
                     setTimeout(() => {
                         modalImg.src = imgSrc;
-                        modalImg.alt = imgAlt;
                     }, 50);
                     
                     imgModal.classList.add('active');
@@ -1142,6 +1222,14 @@
                 imgModal.classList.remove('active');
                 document.body.style.overflow = 'auto';
                 document.documentElement.style.overflow = 'auto';
+                
+                // 重置缩放状态
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                lastTranslateX = 0;
+                lastTranslateY = 0;
+                modalImg.style.transform = '';
             }
 
             closeModal.addEventListener('click', closeModalFunc);
@@ -1158,22 +1246,154 @@
                 }
             });
 
+            // 拖拽功能
+            modalContent.addEventListener('mousedown', (e) => {
+                if (scale > 1) { // 只有缩放后才能拖拽
+                    isDragging = true;
+                    modalContent.classList.add('grabbing');
+                    startX = e.clientX - lastTranslateX;
+                    startY = e.clientY - lastTranslateY;
+                    e.preventDefault(); // 防止图片拖拽
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                
+                // 限制拖拽范围
+                const imgRect = modalImg.getBoundingClientRect();
+                const maxX = Math.max(0, (imgRect.width * scale - imgRect.width) / 2);
+                const maxY = Math.max(0, (imgRect.height * scale - imgRect.height) / 2);
+                
+                translateX = Math.max(-maxX, Math.min(translateX, maxX));
+                translateY = Math.max(-maxY, Math.min(translateY, maxY));
+                
+                modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    modalContent.classList.remove('grabbing');
+                    lastTranslateX = translateX;
+                    lastTranslateY = translateY;
+                }
+            });
+
+            // 滚轮缩放功能
+            modalContent.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                // 计算鼠标位置相对于图片的坐标
+                const rect = modalImg.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // 计算缩放增量
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                const newScale = Math.min(Math.max(minScale, scale + delta), maxScale);
+                
+                // 如果缩放比例不变，直接返回
+                if (newScale === scale) return;
+                
+                // 计算缩放中心点
+                const originX = (mouseX / rect.width) * 100;
+                const originY = (mouseY / rect.height) * 100;
+                
+                // 设置缩放原点
+                modalImg.style.transformOrigin = `${originX}% ${originY}%`;
+                
+                // 更新缩放比例
+                scale = newScale;
+                
+                // 应用缩放
+                modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }, { passive: false });
+
+            // 移动端触摸支持
             let touchStartX = 0;
             let touchStartY = 0;
+            let touchStartScale = 1;
             
+            // 单指拖拽
+            modalContent.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1 && scale > 1) {
+                    isDragging = true;
+                    startX = e.touches[0].clientX - lastTranslateX;
+                    startY = e.touches[0].clientY - lastTranslateY;
+                } else if (e.touches.length === 2) {
+                    // 双指缩放开始
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+                    touchStartScale = distance;
+                }
+            });
+            
+            modalContent.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && isDragging) {
+                    // 单指拖拽
+                    translateX = e.touches[0].clientX - startX;
+                    translateY = e.touches[0].clientY - startY;
+                    
+                    // 限制拖拽范围
+                    const imgRect = modalImg.getBoundingClientRect();
+                    const maxX = Math.max(0, (imgRect.width * scale - imgRect.width) / 2);
+                    const maxY = Math.max(0, (imgRect.height * scale - imgRect.height) / 2);
+                    
+                    translateX = Math.max(-maxX, Math.min(translateX, maxX));
+                    translateY = Math.max(-maxY, Math.min(translateY, maxY));
+                    
+                    modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                } else if (e.touches.length === 2) {
+                    // 双指缩放
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+                    const scaleDelta = distance / touchStartScale;
+                    
+                    const newScale = Math.min(Math.max(minScale, touchStartScale * scaleDelta), maxScale);
+                    scale = newScale;
+                    
+                    // 计算中心点
+                    const centerX = (touch1.clientX + touch2.clientX) / 2;
+                    const centerY = (touch1.clientY + touch2.clientY) / 2;
+                    const rect = modalImg.getBoundingClientRect();
+                    const originX = ((centerX - rect.left) / rect.width) * 100;
+                    const originY = ((centerY - rect.top) / rect.height) * 100;
+                    
+                    modalImg.style.transformOrigin = `${originX}% ${originY}%`;
+                    modalImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                }
+            });
+            
+            modalContent.addEventListener('touchend', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    lastTranslateX = translateX;
+                    lastTranslateY = translateY;
+                }
+            });
+            
+            // 移动端滑动关闭
             imgModal.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
             });
             
             imgModal.addEventListener('touchend', (e) => {
-                const touchEndX = e.changedTouches[0].clientX;
-                const touchEndY = e.changedTouches[0].clientY;
-                const diffX = touchEndX - touchStartX;
-                const diffY = touchEndY - touchStartY;
-                
-                if (Math.abs(diffX) > 50 || Math.abs(diffY) > 50) {
-                    closeModalFunc();
+                if (scale === 1) { // 只有在原始缩放比例下才能滑动关闭
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const diffX = touchEndX - touchStartX;
+                    const diffY = touchEndY - touchStartY;
+                    
+                    if (Math.abs(diffX) > 50 || Math.abs(diffY) > 50) {
+                        closeModalFunc();
+                    }
                 }
             });
         }
@@ -1217,13 +1437,13 @@
             revealOnScroll();
             window.addEventListener('scroll', revealOnScroll);
             
-            // 立即加载画廊，不延迟
+            // 立即加载画廊
             await loadAllGalleryImages();
             
             if (!('scrollBehavior' in document.documentElement.style)) {
                 import('https://cdn.jsdelivr.net/npm/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js').then(() => {
                     smoothscroll.polyfill();
-                });
+                }).catch(err => console.log('平滑滚动兼容库加载失败:', err));
             }
         });
     </script>
