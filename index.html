@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>李欢 - 跨境电商视觉设计师</title>
     <style>
-        /* 全局重置+基础规范（参考苹果官网） */
+        /* 全局重置+基础规范（参考苹果官网+花瓣网） */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #1d1d1f; /* 苹果深空灰 */
@@ -43,6 +43,7 @@
             color: var(--primary);
             margin-bottom: 48px;
             letter-spacing: -0.5px;
+            text-align: center; /* 居中排版 */
         }
         @media (max-width: 768px) {
             .section {
@@ -94,7 +95,7 @@
             transform: translateY(-1px);
         }
 
-        /* 英雄区（参考华为官网） */
+        /* 英雄区（新增简历下载按钮） */
         .hero {
             padding-top: 120px;
             padding-bottom: 80px;
@@ -107,7 +108,7 @@
             height: 120px;
             border-radius: 50%;
             overflow: hidden;
-            margin: 0 auto 24px;
+            margin: 0 auto 16px; /* 调整间距适配按钮 */
             border: 4px solid #fff;
             box-shadow: var(--shadow-sm);
         }
@@ -116,6 +117,27 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+        /* 简历下载按钮样式 */
+        .resume-btn-wrapper {
+            margin: 16px 0; /* 按钮上下间距 */
+        }
+        .resume-btn {
+            padding: 10px 24px;
+            background-color: var(--secondary);
+            color: #fff;
+            border-radius: 24px;
+            font-size: 16px;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            display: inline-block;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+        .resume-btn:hover {
+            background-color: #0077ed;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         .hero-title {
             font-size: 40px;
@@ -248,6 +270,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto; /* 居中 */
         }
         .advantage-card {
             background-color: #fff;
@@ -315,6 +339,9 @@
             display: flex;
             flex-wrap: wrap;
             gap: 16px;
+            justify-content: center; /* 居中 */
+            max-width: 1000px;
+            margin: 0 auto;
         }
         .skill-tag {
             padding: 12px 24px;
@@ -340,7 +367,7 @@
             }
         }
 
-        /* 作品展示（苹果级卡片+正确跳转） */
+        /* 作品分类筛选（仅保留4大类，居中） */
         .works-section {
             background-color: var(--light-gray);
         }
@@ -349,6 +376,7 @@
             flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 32px;
+            justify-content: center; /* 居中 */
         }
         .filter-btn {
             padding: 8px 20px;
@@ -369,53 +397,87 @@
             border-color: var(--secondary);
             color: var(--secondary);
         }
-        .works-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 24px;
-        }
-        .work-card {
+
+        /* 花瓣风格全图画廊（核心新增，居中+自适应） */
+        .gallery-section {
             background-color: #fff;
-            border-radius: 12px;
+            padding: 80px 0;
+        }
+        .petal-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 花瓣网自适应网格 */
+            gap: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .gallery-item {
+            border-radius: 8px;
             overflow: hidden;
             box-shadow: var(--shadow-sm);
+            cursor: pointer;
             transition: var(--transition-base);
-            text-decoration: none;
-            color: inherit;
-            display: block;
+            aspect-ratio: 1/1; /* 正方形小窗 */
         }
-        .work-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-6px);
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: var(--shadow-md);
         }
-        .work-img {
-            width: 100%;
-            height: 220px;
-            background-color: var(--mid-gray);
-        }
-        .work-img img {
+        .gallery-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: var(--transition-fast);
+            object-fit: cover; /* 裁剪展示（小窗） */
             display: block;
         }
-        .work-card:hover .work-img img {
-            transform: scale(1.05);
-        }
-        .work-content {
+        /* 图片弹窗（查看完整图） */
+        .img-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
-        .work-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
+        .img-modal.active {
+            display: flex;
         }
-        .work-meta {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .modal-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* 完整展示 */
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .close-modal:hover {
+            color: var(--secondary);
+        }
+        @media (max-width: 768px) {
+            .petal-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            .close-modal {
+                font-size: 30px;
+                top: 15px;
+                right: 20px;
+            }
         }
 
         /* 页脚 */
@@ -447,11 +509,15 @@
         </div>
     </header>
 
-    <!-- 英雄区 -->
+    <!-- 英雄区（新增简历下载按钮） -->
     <section class="hero">
         <div class="container">
             <div class="hero-avatar">
                 <img src="avatar.jpg" alt="李欢-职业头像">
+            </div>
+            <!-- 简历下载按钮 -->
+            <div class="resume-btn-wrapper">
+                <a href="resume-lihuan.pdf" download class="resume-btn">下载我的简历</a>
             </div>
             <h1 class="hero-title">李欢</h1>
             <span class="hero-tag">8年跨境电商视觉设计经验</span>
@@ -543,97 +609,77 @@
         </div>
     </section>
 
-    <!-- 作品展示 -->
+    <!-- 作品分类筛选（仅保留4大类） -->
     <section class="section works-section">
         <div class="container">
-            <h2 class="section-title">作品展示</h2>
+            <h2 class="section-title">作品分类</h2>
             <div class="works-filter">
-                <button class="filter-btn active" data-filter="all">全部作品</button>
                 <a href="electric.html"><button class="filter-btn" data-filter="electric">电动出行工具类</button></a>
                 <a href="home.html"><button class="filter-btn" data-filter="home">家居家电类</button></a>
                 <a href="3d.html"><button class="filter-btn" data-filter="3d">3D打印&雕刻类</button></a>
                 <a href="3c.html"><button class="filter-btn" data-filter="3c">3C数码类</button></a>
             </div>
-            <div class="works-grid">
-                <!-- 电动出行工具类 -->
-                <a href="electric.html" class="work-card" data-category="electric">
-                    <div class="work-img">
-                        <img src="electric1.jpg" alt="KUGO LX10+电动滑板车">
-                    </div>
-                    <div class="work-content">
-                        <h3 class="work-title">KUGO LX10+电动滑板车</h3>
-                        <div class="work-meta">
-                            <p>平台：独立站产品页</p>
-                            <p>成果：咨询转化率提升19%</p>
-                        </div>
-                    </div>
-                </a>
-                <a href="electric.html" class="work-card" data-category="electric">
-                    <div class="work-img">
-                        <img src="electric2.jpg" alt="Eleglide T1ST电动自行车">
-                    </div>
-                    <div class="work-content">
-                        <h3 class="work-title">Eleglide T1ST电动自行车</h3>
-                        <div class="work-meta">
-                            <p>平台：独立站首页</p>
-                            <p>成果：引流转化率提升18%</p>
-                        </div>
-                    </div>
-                </a>
-                <!-- 家居家电类 -->
-                <a href="home.html" class="work-card" data-category="home">
-                    <div class="work-img">
-                        <img src="home1.jpg" alt="ACGAM电动升降桌">
-                    </div>
-                    <div class="work-content">
-                        <h3 class="work-title">ACGAM电动升降桌</h3>
-                        <div class="work-meta">
-                            <p>平台：独立站产品页</p>
-                            <p>成果：加购率提升17%</p>
-                        </div>
-                    </div>
-                </a>
-                <a href="home.html" class="work-card" data-category="home">
-                    <div class="work-img">
-                        <img src="home2.jpg" alt="JIGOO除螨仪">
-                    </div>
-                    <div class="work-content">
-                        <h3 class="work-title">JIGOO除螨仪</h3>
-                        <div class="work-meta">
-                            <p>平台：亚马逊A+页面</p>
-                            <p>成果：用户功能认知度提升35%</p>
-                        </div>
-                    </div>
-                </a>
-                <!-- 3D打印&雕刻类 -->
-                <a href="3d.html" class="work-card" data-category="3d">
-                    <div class="work-img">
-                        <img src="3d1.jpg" alt="MECPOW M1桌面激光雕刻机">
-                    </div>
-                    <div class="work-content">
-                        <h3 class="work-title">MECPOW M1桌面激光雕刻机</h3>
-                        <div class="work-meta">
-                            <p>平台：独立站产品页</p>
-                            <p>成果：欧美市场订单量增长25%</p>
-                        </div>
-                    </div>
-                </a>
-                <!-- 3C数码类 -->
-                <a href="3c.html" class="work-card" data-category="3c">
-                    <div class="work-img">
-                        <img src="3c1.jpg" alt="迷你PC">
-                    </div>
-                    <div class="work-content">
-                        <h3 class="work-title">迷你PC</h3>
-                        <div class="work-meta">
-                            <p>平台：独立站详情页</p>
-                            <p>成果：页面停留时长增加30%</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
         </div>
     </section>
+
+    <!-- 花瓣风格全图画廊（展示所有图片，小窗裁剪+点击看完整图） -->
+    <section class="gallery-section">
+        <h2 class="section-title">全部作品画廊</h2>
+        <div class="petal-gallery">
+            <!-- 电动出行工具类 -->
+            <div class="gallery-item" data-img="electric1.jpg">
+                <img src="electric1.jpg" alt="KUGO LX10+电动滑板车" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="electric2.jpg">
+                <img src="electric2.jpg" alt="Eleglide T1ST电动自行车" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="electric3.jpg">
+                <img src="electric3.jpg" alt="FORDE Xtremer 2电动自行车" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="electric4.jpg">
+                <img src="electric4.jpg" alt="TOURU城市&郊区电动自行车" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="electric5.jpg">
+                <img src="electric5.jpg" alt="多功能电动自行车" class="gallery-img">
+            </div>
+            <!-- 家居家电类 -->
+            <div class="gallery-item" data-img="home1.jpg">
+                <img src="home1.jpg" alt="ACGAM电动升降桌" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="home2.jpg">
+                <img src="home2.jpg" alt="JIGOO除螨仪" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="home3.jpg">
+                <img src="home3.jpg" alt="人体工学办公椅" class="gallery-img">
+            </div>
+            <!-- 3D打印&雕刻类 -->
+            <div class="gallery-item" data-img="3d1.jpg">
+                <img src="3d1.jpg" alt="MECPOW M1桌面激光雕刻机" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="3d2.jpg">
+                <img src="3d2.jpg" alt="工业级3D打印机" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="3d3.jpg">
+                <img src="3d3.jpg" alt="MECPOW X1双激光雕刻机" class="gallery-img">
+            </div>
+            <div class="gallery-item" data-img="3d4.jpg">
+                <img src="3d4.jpg" alt="3D打印耗材" class="gallery-img">
+            </div>
+            <!-- 3C数码类 -->
+            <div class="gallery-item" data-img="3c1.jpg">
+                <img src="3c1.jpg" alt="迷你PC" class="gallery-img">
+            </div>
+            <!-- 新增图片：直接复制上面的gallery-item结构，替换data-img和src即可 -->
+        </div>
+    </section>
+
+    <!-- 图片弹窗（查看完整图） -->
+    <div class="img-modal" id="imgModal">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <div class="modal-content">
+            <img src="" alt="完整作品图" class="modal-img" id="modalImg">
+        </div>
+    </div>
 
     <!-- 页脚 -->
     <footer class="footer">
@@ -651,7 +697,7 @@
     </footer>
 
     <script>
-        // 轮播功能（苹果级丝滑交互）
+        // 轮播功能
         const carouselItems = document.querySelectorAll('.carousel-item');
         const carouselIndicators = document.querySelectorAll('.carousel-indicator');
         const prevBtn = document.querySelector('.carousel-control.prev');
@@ -705,37 +751,39 @@
         document.querySelector('.carousel').addEventListener('mouseleave', startSlideInterval);
         startSlideInterval();
 
-        // 作品筛选功能（无数量限制）
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const workCards = document.querySelectorAll('.work-card');
+        // 花瓣画廊弹窗功能（点击小图看完整图）
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const imgModal = document.getElementById('imgModal');
+        const modalImg = document.getElementById('modalImg');
+        const closeModal = document.getElementById('closeModal');
 
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (!e.target.closest('a')) {
-                    const filter = btn.dataset.filter;
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-
-                    workCards.forEach(card => {
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            if (filter === 'all' || card.dataset.category === filter) {
-                                card.style.display = 'block';
-                                setTimeout(() => {
-                                    card.style.opacity = '1';
-                                    card.style.transform = 'scale(1)';
-                                }, 100);
-                            } else {
-                                card.style.display = 'none';
-                            }
-                        }, 200);
-                    });
-                }
+        // 点击小图打开弹窗
+        galleryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const imgSrc = item.getAttribute('data-img');
+                modalImg.src = imgSrc;
+                imgModal.classList.add('active');
+                // 禁止页面滚动
+                document.body.style.overflow = 'hidden';
             });
         });
 
-        // 滚动渐显效果（参考华为官网）
+        // 关闭弹窗
+        closeModal.addEventListener('click', () => {
+            imgModal.classList.remove('active');
+            // 恢复页面滚动
+            document.body.style.overflow = 'auto';
+        });
+
+        // 点击弹窗外区域关闭
+        imgModal.addEventListener('click', (e) => {
+            if (e.target === imgModal) {
+                imgModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // 滚动渐显效果
         function revealOnScroll() {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => {
