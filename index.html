@@ -115,6 +115,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
         .hero-title {
             font-size: 40px;
@@ -171,6 +172,7 @@
             max-height: 100%;
             object-fit: contain;
             transition: transform 0.5s ease;
+            display: block;
         }
         .carousel-item:hover img {
             transform: scale(1.02);
@@ -274,6 +276,7 @@
             height: 100%;
             object-fit: cover;
             transition: var(--transition-fast);
+            display: block;
         }
         .advantage-img::after {
             content: attr(data-loading);
@@ -395,6 +398,7 @@
             height: 100%;
             object-fit: cover;
             transition: var(--transition-fast);
+            display: block;
         }
         .work-card:hover .work-img img {
             transform: scale(1.05);
@@ -655,7 +659,6 @@
         let currentSlide = 0;
         let slideInterval;
 
-        // 切换轮播
         function goToSlide(index) {
             carouselItems.forEach(item => item.classList.remove('active'));
             carouselIndicators.forEach(indicator => indicator.classList.remove('active'));
@@ -664,24 +667,20 @@
             currentSlide = index;
         }
 
-        // 下一张
         function nextSlide() {
             let newIndex = (currentSlide + 1) % carouselItems.length;
             goToSlide(newIndex);
         }
 
-        // 上一张
         function prevSlide() {
             let newIndex = (currentSlide - 1 + carouselItems.length) % carouselItems.length;
             goToSlide(newIndex);
         }
 
-        // 自动轮播
         function startSlideInterval() {
             slideInterval = setInterval(nextSlide, 6000);
         }
 
-        // 事件绑定
         prevBtn.addEventListener('click', () => {
             clearInterval(slideInterval);
             prevSlide();
@@ -702,37 +701,24 @@
             });
         });
 
-        // 鼠标悬停暂停轮播
-        document.querySelector('.carousel').addEventListener('mouseenter', () => {
-            clearInterval(slideInterval);
-        });
-
-        document.querySelector('.carousel').addEventListener('mouseleave', () => {
-            startSlideInterval();
-        });
-
-        // 初始化轮播
+        document.querySelector('.carousel').addEventListener('mouseenter', () => clearInterval(slideInterval));
+        document.querySelector('.carousel').addEventListener('mouseleave', startSlideInterval);
         startSlideInterval();
 
-        // 作品筛选功能（修复筛选逻辑）
+        // 作品筛选功能（无数量限制）
         const filterBtns = document.querySelectorAll('.filter-btn');
         const workCards = document.querySelectorAll('.work-card');
 
         filterBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                // 排除跳转按钮，只处理筛选逻辑
                 if (!e.target.closest('a')) {
                     const filter = btn.dataset.filter;
-                    
-                    // 更新按钮状态
                     filterBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
-                    // 筛选作品
+
                     workCards.forEach(card => {
                         card.style.opacity = '0';
                         card.style.transform = 'scale(0.95)';
-                        
                         setTimeout(() => {
                             if (filter === 'all' || card.dataset.category === filter) {
                                 card.style.display = 'block';
@@ -752,11 +738,9 @@
         // 滚动渐显效果（参考华为官网）
         function revealOnScroll() {
             const sections = document.querySelectorAll('.section');
-            
             sections.forEach(section => {
                 const sectionTop = section.getBoundingClientRect().top;
                 const windowHeight = window.innerHeight;
-                
                 if (sectionTop < windowHeight * 0.85) {
                     section.style.opacity = '1';
                     section.style.transform = 'translateY(0)';
@@ -764,7 +748,6 @@
             });
         }
 
-        // 初始化滚动效果
         document.querySelectorAll('.section').forEach(section => {
             section.style.opacity = '0';
             section.style.transform = 'translateY(20px)';
