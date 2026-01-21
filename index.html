@@ -43,7 +43,7 @@
             color: var(--primary);
             margin-bottom: 48px;
             letter-spacing: -0.5px;
-            text-align: center; /* 居中排版 */
+            text-align: center; /* 全局居中排版 */
         }
         @media (max-width: 768px) {
             .section {
@@ -95,7 +95,7 @@
             transform: translateY(-1px);
         }
 
-        /* 英雄区（新增简历下载按钮） */
+        /* 英雄区（含简历下载按钮） */
         .hero {
             padding-top: 120px;
             padding-bottom: 80px;
@@ -108,7 +108,7 @@
             height: 120px;
             border-radius: 50%;
             overflow: hidden;
-            margin: 0 auto 16px; /* 调整间距适配按钮 */
+            margin: 0 auto 16px;
             border: 4px solid #fff;
             box-shadow: var(--shadow-sm);
         }
@@ -116,11 +116,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
+            display: block; /* 适配PNG透明底 */
         }
         /* 简历下载按钮样式 */
         .resume-btn-wrapper {
-            margin: 16px 0; /* 按钮上下间距 */
+            margin: 16px 0;
         }
         .resume-btn {
             padding: 10px 24px;
@@ -192,9 +192,9 @@
         .carousel-item img {
             max-width: 100%;
             max-height: 100%;
-            object-fit: contain;
+            object-fit: contain; /* 完整展示，适配所有格式 */
             transition: transform 0.5s ease;
-            display: block;
+            display: block; /* 消除PNG底部空白 */
         }
         .carousel-item:hover img {
             transform: scale(1.02);
@@ -262,7 +262,7 @@
             }
         }
 
-        /* 核心优势（华为级图文布局） */
+        /* 核心优势（适配PNG/JPG，修复展示问题） */
         .advantages-section {
             background-color: var(--light-gray);
         }
@@ -298,10 +298,11 @@
         .advantage-img img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; /* 适配PNG/JPG */
+            display: block; /* 消除透明底空白 */
             transition: var(--transition-fast);
-            display: block;
         }
+        /* 加载提示（仅图片未加载时显示） */
         .advantage-img::after {
             content: attr(data-loading);
             position: absolute;
@@ -313,7 +314,8 @@
             opacity: 0;
             pointer-events: none;
         }
-        .advantage-img img:empty::after {
+        .advantage-img img:not([src])::after,
+        .advantage-img img[src=""]::after {
             opacity: 1;
         }
         .advantage-content {
@@ -331,7 +333,7 @@
             line-height: 1.6;
         }
 
-        /* 核心技能（小米级标签设计） */
+        /* 核心技能（小米级标签设计，居中） */
         .skills-section {
             background-color: #fff;
         }
@@ -367,38 +369,79 @@
             }
         }
 
-        /* 作品分类筛选（仅保留4大类，居中） */
+        /* 作品分类筛选（悬浮卡片样式，保留跳转，仅4大类） */
         .works-section {
             background-color: var(--light-gray);
         }
-        .works-filter {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 32px;
-            justify-content: center; /* 居中 */
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto; /* 居中 */
         }
-        .filter-btn {
-            padding: 8px 20px;
+        /* 分类卡片（和核心优势同款悬浮样式） */
+        .category-card {
             background-color: #fff;
-            border: 1px solid var(--mid-gray);
-            border-radius: 20px;
-            font-size: 15px;
-            color: var(--text-primary);
-            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+            position: relative;
+            top: 0;
+            text-decoration: none; /* 清除a标签下划线 */
+            display: block; /* 确保卡片可点击 */
+        }
+        .category-card:hover {
+            box-shadow: var(--shadow-lg);
+            top: -8px;
+        }
+        .category-img {
+            width: 100%;
+            height: 180px;
+            background-color: var(--mid-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .category-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 适配缩略图 */
+            display: block; /* 消除PNG底部空白 */
             transition: var(--transition-fast);
         }
-        .filter-btn.active {
-            background-color: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
+        .category-content {
+            padding: 24px;
+            text-align: center;
         }
-        .filter-btn:not(.active):hover {
-            border-color: var(--secondary);
-            color: var(--secondary);
+        .category-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .category-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        /* 移动端分类卡片适配 */
+        @media (max-width: 768px) {
+            .works-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 24px;
+            }
+            .category-img {
+                height: 150px;
+            }
+            .category-title {
+                font-size: 18px;
+            }
         }
 
-        /* 花瓣风格全图画廊（核心新增，居中+自适应） */
+        /* 花瓣风格智能画廊（自动加载4大类图片） */
         .gallery-section {
             background-color: #fff;
             padding: 80px 0;
@@ -426,10 +469,10 @@
         .gallery-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 裁剪展示（小窗） */
-            display: block;
+            object-fit: cover; /* 小窗裁剪展示 */
+            display: block; /* 消除PNG底部空白 */
         }
-        /* 图片弹窗（查看完整图） */
+        /* 图片弹窗（查看完整图，适配所有格式） */
         .img-modal {
             position: fixed;
             top: 0;
@@ -453,7 +496,8 @@
         .modal-img {
             max-width: 100%;
             max-height: 100%;
-            object-fit: contain; /* 完整展示 */
+            object-fit: contain; /* 完整展示，不裁剪 */
+            display: block; /* 适配PNG透明底 */
         }
         .close-modal {
             position: absolute;
@@ -468,6 +512,13 @@
         .close-modal:hover {
             color: var(--secondary);
         }
+        /* 加载提示 */
+        .gallery-loading {
+            text-align: center;
+            font-size: 18px;
+            color: var(--text-secondary);
+            padding: 40px 0;
+        }
         @media (max-width: 768px) {
             .petal-gallery {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -480,7 +531,7 @@
             }
         }
 
-        /* 页脚 */
+        /* 页脚（居中） */
         .footer {
             background-color: var(--primary);
             color: #fff;
@@ -509,13 +560,13 @@
         </div>
     </header>
 
-    <!-- 英雄区（新增简历下载按钮） -->
+    <!-- 英雄区（含简历下载按钮） -->
     <section class="hero">
         <div class="container">
             <div class="hero-avatar">
                 <img src="avatar.jpg" alt="李欢-职业头像">
             </div>
-            <!-- 简历下载按钮 -->
+            <!-- 简历下载按钮（一键下载，文件名严格为resume-lihuan.pdf） -->
             <div class="resume-btn-wrapper">
                 <a href="resume-lihuan.pdf" download class="resume-btn">下载我的简历</a>
             </div>
@@ -547,14 +598,14 @@
         </div>
     </section>
 
-    <!-- 核心优势 -->
+    <!-- 核心优势（适配PNG/JPG） -->
     <section class="section advantages-section">
         <div class="container">
             <h2 class="section-title">核心优势</h2>
             <div class="advantages-grid">
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage1.jpg" alt="AIGC高效赋能">
+                        <img src="advantage1.png" alt="AIGC高效赋能"> <!-- 示例PNG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">AIGC高效赋能</h3>
@@ -563,7 +614,7 @@
                 </div>
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage2.jpg" alt="全栈设计硬实力">
+                        <img src="advantage2.jpg" alt="全栈设计硬实力"> <!-- 示例JPG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">全栈设计硬实力</h3>
@@ -572,7 +623,7 @@
                 </div>
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage3.jpg" alt="多领域设计驾驭">
+                        <img src="advantage3.png" alt="多领域设计驾驭"> <!-- 示例PNG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">多领域设计驾驭</h3>
@@ -581,7 +632,7 @@
                 </div>
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage4.jpg" alt="职业素养拉满">
+                        <img src="advantage4.jpg" alt="职业素养拉满"> <!-- 示例JPG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">职业素养拉满</h3>
@@ -609,68 +660,62 @@
         </div>
     </section>
 
-    <!-- 作品分类筛选（仅保留4大类） -->
+    <!-- 作品分类（悬浮卡片样式，保留跳转） -->
     <section class="section works-section">
         <div class="container">
             <h2 class="section-title">作品分类</h2>
-            <div class="works-filter">
-                <a href="electric.html"><button class="filter-btn" data-filter="electric">电动出行工具类</button></a>
-                <a href="home.html"><button class="filter-btn" data-filter="home">家居家电类</button></a>
-                <a href="3d.html"><button class="filter-btn" data-filter="3d">3D打印&雕刻类</button></a>
-                <a href="3c.html"><button class="filter-btn" data-filter="3c">3C数码类</button></a>
+            <div class="works-grid">
+                <!-- 电动出行工具类（悬浮卡片+跳转） -->
+                <a href="electric.html" class="category-card">
+                    <div class="category-img">
+                        <img src="electric_thumb.jpg" alt="电动出行工具类缩略图">
+                    </div>
+                    <div class="category-content">
+                        <h3 class="category-title">电动出行工具类</h3>
+                        <p class="category-desc">电动滑板车、电动自行车等跨境产品视觉设计</p>
+                    </div>
+                </a>
+                <!-- 家居家电类（悬浮卡片+跳转） -->
+                <a href="home.html" class="category-card">
+                    <div class="category-img">
+                        <img src="home_thumb.jpg" alt="家居家电类缩略图">
+                    </div>
+                    <div class="category-content">
+                        <h3 class="category-title">家居家电类</h3>
+                        <p class="category-desc">升降桌、除螨仪、办公椅等家居产品设计</p>
+                    </div>
+                </a>
+                <!-- 3D打印&雕刻类（悬浮卡片+跳转） -->
+                <a href="3d.html" class="category-card">
+                    <div class="category-img">
+                        <img src="3d_thumb.jpg" alt="3D打印&雕刻类缩略图">
+                    </div>
+                    <div class="category-content">
+                        <h3 class="category-title">3D打印&雕刻类</h3>
+                        <p class="category-desc">激光雕刻机、3D打印机等工业产品视觉设计</p>
+                    </div>
+                </a>
+                <!-- 3C数码类（悬浮卡片+跳转） -->
+                <a href="3c.html" class="category-card">
+                    <div class="category-img">
+                        <img src="3c_thumb.jpg" alt="3C数码类缩略图">
+                    </div>
+                    <div class="category-content">
+                        <h3 class="category-title">3C数码类</h3>
+                        <p class="category-desc">迷你PC等3C数码产品跨境视觉设计</p>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- 花瓣风格全图画廊（展示所有图片，小窗裁剪+点击看完整图） -->
+    <!-- 智能画廊（自动加载4大类图片） -->
     <section class="gallery-section">
         <h2 class="section-title">全部作品画廊</h2>
-        <div class="petal-gallery">
-            <!-- 电动出行工具类 -->
-            <div class="gallery-item" data-img="electric1.jpg">
-                <img src="electric1.jpg" alt="KUGO LX10+电动滑板车" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="electric2.jpg">
-                <img src="electric2.jpg" alt="Eleglide T1ST电动自行车" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="electric3.jpg">
-                <img src="electric3.jpg" alt="FORDE Xtremer 2电动自行车" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="electric4.jpg">
-                <img src="electric4.jpg" alt="TOURU城市&郊区电动自行车" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="electric5.jpg">
-                <img src="electric5.jpg" alt="多功能电动自行车" class="gallery-img">
-            </div>
-            <!-- 家居家电类 -->
-            <div class="gallery-item" data-img="home1.jpg">
-                <img src="home1.jpg" alt="ACGAM电动升降桌" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="home2.jpg">
-                <img src="home2.jpg" alt="JIGOO除螨仪" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="home3.jpg">
-                <img src="home3.jpg" alt="人体工学办公椅" class="gallery-img">
-            </div>
-            <!-- 3D打印&雕刻类 -->
-            <div class="gallery-item" data-img="3d1.jpg">
-                <img src="3d1.jpg" alt="MECPOW M1桌面激光雕刻机" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="3d2.jpg">
-                <img src="3d2.jpg" alt="工业级3D打印机" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="3d3.jpg">
-                <img src="3d3.jpg" alt="MECPOW X1双激光雕刻机" class="gallery-img">
-            </div>
-            <div class="gallery-item" data-img="3d4.jpg">
-                <img src="3d4.jpg" alt="3D打印耗材" class="gallery-img">
-            </div>
-            <!-- 3C数码类 -->
-            <div class="gallery-item" data-img="3c1.jpg">
-                <img src="3c1.jpg" alt="迷你PC" class="gallery-img">
-            </div>
-            <!-- 新增图片：直接复制上面的gallery-item结构，替换data-img和src即可 -->
-        </div>
+        <!-- 加载提示 -->
+        <div class="gallery-loading" id="galleryLoading">正在加载作品图片...</div>
+        <!-- 画廊容器（动态生成） -->
+        <div class="petal-gallery" id="petalGallery"></div>
     </section>
 
     <!-- 图片弹窗（查看完整图） -->
@@ -696,8 +741,9 @@
         </div>
     </footer>
 
+    <!-- 完整无省略的JavaScript脚本 -->
     <script>
-        // 轮播功能
+        // ==================== 1. 轮播功能（完整逻辑） ====================
         const carouselItems = document.querySelectorAll('.carousel-item');
         const carouselIndicators = document.querySelectorAll('.carousel-indicator');
         const prevBtn = document.querySelector('.carousel-control.prev');
@@ -705,6 +751,7 @@
         let currentSlide = 0;
         let slideInterval;
 
+        // 切换到指定轮播图
         function goToSlide(index) {
             carouselItems.forEach(item => item.classList.remove('active'));
             carouselIndicators.forEach(indicator => indicator.classList.remove('active'));
@@ -713,32 +760,38 @@
             currentSlide = index;
         }
 
+        // 下一张轮播图
         function nextSlide() {
             let newIndex = (currentSlide + 1) % carouselItems.length;
             goToSlide(newIndex);
         }
 
+        // 上一张轮播图
         function prevSlide() {
             let newIndex = (currentSlide - 1 + carouselItems.length) % carouselItems.length;
             goToSlide(newIndex);
         }
 
+        // 启动自动轮播
         function startSlideInterval() {
             slideInterval = setInterval(nextSlide, 6000);
         }
 
+        // 上一页按钮点击事件
         prevBtn.addEventListener('click', () => {
             clearInterval(slideInterval);
             prevSlide();
             startSlideInterval();
         });
 
+        // 下一页按钮点击事件
         nextBtn.addEventListener('click', () => {
             clearInterval(slideInterval);
             nextSlide();
             startSlideInterval();
         });
 
+        // 轮播指示器点击事件
         carouselIndicators.forEach((indicator, index) => {
             indicator.addEventListener('click', () => {
                 clearInterval(slideInterval);
@@ -747,48 +800,170 @@
             });
         });
 
+        // 鼠标悬停轮播区暂停自动轮播
         document.querySelector('.carousel').addEventListener('mouseenter', () => clearInterval(slideInterval));
+        // 鼠标离开轮播区恢复自动轮播
         document.querySelector('.carousel').addEventListener('mouseleave', startSlideInterval);
+
+        // 初始化轮播
         startSlideInterval();
 
-        // 花瓣画廊弹窗功能（点击小图看完整图）
-        const galleryItems = document.querySelectorAll('.gallery-item');
-        const imgModal = document.getElementById('imgModal');
-        const modalImg = document.getElementById('modalImg');
-        const closeModal = document.getElementById('closeModal');
+        // ==================== 2. 智能画廊（自动加载4大类图片） ====================
+        // 定义4大类图片前缀（按命名规则）
+        const imageCategories = [
+            { prefix: 'electric', name: '电动出行工具' },
+            { prefix: 'home', name: '家居家电' },
+            { prefix: '3d', name: '3D打印&雕刻' },
+            { prefix: '3c', name: '3C数码' }
+        ];
+        // 支持的图片格式
+        const imageFormats = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        // 最大尝试数量（防止无限循环）
+        const maxImageNumber = 50;
+        // 画廊容器
+        const galleryContainer = document.getElementById('petalGallery');
+        const galleryLoading = document.getElementById('galleryLoading');
+        // 已加载的图片列表（避免重复）
+        let loadedImages = [];
 
-        // 点击小图打开弹窗
-        galleryItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const imgSrc = item.getAttribute('data-img');
-                modalImg.src = imgSrc;
-                imgModal.classList.add('active');
-                // 禁止页面滚动
-                document.body.style.overflow = 'hidden';
+        // 检查图片是否存在
+        function checkImageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
             });
-        });
+        }
 
-        // 关闭弹窗
-        closeModal.addEventListener('click', () => {
-            imgModal.classList.remove('active');
-            // 恢复页面滚动
-            document.body.style.overflow = 'auto';
-        });
-
-        // 点击弹窗外区域关闭
-        imgModal.addEventListener('click', (e) => {
-            if (e.target === imgModal) {
-                imgModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
+        // 生成图片描述
+        function generateImageDescription(prefix, number, categoryName) {
+            const descriptions = {
+                electric: [`KUGO LX10+电动滑板车`, `Eleglide T1ST电动自行车`, `FORDE Xtremer 2电动自行车`, `TOURU城市&郊区电动自行车`, `多功能电动自行车`],
+                home: [`ACGAM电动升降桌`, `JIGOO除螨仪`, `人体工学办公椅`],
+                3d: [`MECPOW M1桌面激光雕刻机`, `工业级3D打印机`, `MECPOW X1双激光雕刻机`, `3D打印耗材`],
+                3c: [`迷你PC`]
+            };
+            // 如果有预设描述则使用，否则生成通用描述
+            if (descriptions[prefix] && descriptions[prefix][number - 1]) {
+                return descriptions[prefix][number - 1];
+            } else {
+                return `${categoryName}作品 ${number}`;
             }
-        });
+        }
 
-        // 滚动渐显效果
+        // 加载指定分类的图片
+        async function loadCategoryImages(category) {
+            for (let i = 1; i <= maxImageNumber; i++) {
+                // 尝试所有支持的格式
+                for (const format of imageFormats) {
+                    const imageUrl = `${category.prefix}${i}.${format}`;
+                    // 检查图片是否存在
+                    const exists = await checkImageExists(imageUrl);
+                    if (exists && !loadedImages.includes(imageUrl)) {
+                        // 图片存在且未加载过，添加到画廊
+                        loadedImages.push(imageUrl);
+                        const imageDesc = generateImageDescription(category.prefix, i, category.name);
+                        
+                        // 创建画廊项
+                        const galleryItem = document.createElement('div');
+                        galleryItem.className = 'gallery-item';
+                        galleryItem.setAttribute('data-img', imageUrl);
+                        
+                        // 创建图片元素
+                        const galleryImg = document.createElement('img');
+                        galleryImg.className = 'gallery-img';
+                        galleryImg.src = imageUrl;
+                        galleryImg.alt = imageDesc;
+                        // 图片加载失败处理
+                        galleryImg.addEventListener('error', () => {
+                            galleryImg.src = 'placeholder.png';
+                            galleryImg.alt = '图片加载失败';
+                        });
+                        
+                        // 添加到容器
+                        galleryItem.appendChild(galleryImg);
+                        galleryContainer.appendChild(galleryItem);
+                        
+                        // 跳出格式循环，继续下一个数字
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 加载所有分类的图片
+        async function loadAllGalleryImages() {
+            galleryLoading.textContent = '正在加载作品图片...';
+            
+            // 按分类加载图片
+            for (const category of imageCategories) {
+                await loadCategoryImages(category);
+            }
+            
+            // 隐藏加载提示
+            galleryLoading.style.display = 'none';
+            
+            // 如果没有加载到任何图片
+            if (loadedImages.length === 0) {
+                galleryLoading.textContent = '暂无作品图片，请上传图片后刷新页面';
+                galleryLoading.style.display = 'block';
+            } else {
+                // 初始化画廊弹窗事件
+                initGalleryModal();
+            }
+        }
+
+        // ==================== 3. 画廊弹窗功能 ====================
+        function initGalleryModal() {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            const imgModal = document.getElementById('imgModal');
+            const modalImg = document.getElementById('modalImg');
+            const closeModal = document.getElementById('closeModal');
+
+            // 点击小图打开弹窗
+            galleryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const imgSrc = item.getAttribute('data-img');
+                    modalImg.src = imgSrc;
+                    modalImg.alt = item.querySelector('.gallery-img').alt;
+                    imgModal.classList.add('active');
+                    // 禁止页面滚动
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            // 点击关闭按钮关闭弹窗
+            closeModal.addEventListener('click', () => {
+                imgModal.classList.remove('active');
+                // 恢复页面滚动
+                document.body.style.overflow = 'auto';
+            });
+
+            // 点击弹窗外区域关闭弹窗
+            imgModal.addEventListener('click', (e) => {
+                if (e.target === imgModal) {
+                    imgModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // 按ESC键关闭弹窗
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && imgModal.classList.contains('active')) {
+                    imgModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+
+        // ==================== 4. 滚动渐显效果 ====================
         function revealOnScroll() {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => {
                 const sectionTop = section.getBoundingClientRect().top;
                 const windowHeight = window.innerHeight;
+                // 当元素进入视口85%时显示
                 if (sectionTop < windowHeight * 0.85) {
                     section.style.opacity = '1';
                     section.style.transform = 'translateY(0)';
@@ -796,14 +971,38 @@
             });
         }
 
+        // 初始化渐显样式
         document.querySelectorAll('.section').forEach(section => {
             section.style.opacity = '0';
             section.style.transform = 'translateY(20px)';
             section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
         });
 
-        window.addEventListener('scroll', revealOnScroll);
-        window.addEventListener('load', revealOnScroll);
+        // ==================== 5. 图片加载失败处理 ====================
+        function setupImageErrorHandling() {
+            document.querySelectorAll('img').forEach(img => {
+                img.addEventListener('error', () => {
+                    // 图片加载失败时显示占位图
+                    if (!img.src.includes('placeholder.png')) {
+                        img.src = 'placeholder.png';
+                        img.alt = '图片加载失败';
+                    }
+                });
+            });
+        }
+
+        // ==================== 初始化所有功能 ====================
+        window.addEventListener('load', async () => {
+            // 初始化滚动渐显
+            revealOnScroll();
+            window.addEventListener('scroll', revealOnScroll);
+            
+            // 设置图片加载失败处理
+            setupImageErrorHandling();
+            
+            // 加载画廊图片
+            await loadAllGalleryImages();
+        });
     </script>
 </body>
 </html>
