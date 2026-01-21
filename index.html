@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>李欢 - 跨境电商视觉设计师</title>
+    <meta name="description" content="李欢 8年跨境电商视觉设计师 专注亚马逊A+/独立站视觉/3D渲染/AIGC设计赋能 电动出行/家居家电/3D打印/3C数码产品设计">
+    <meta name="keywords" content="李欢,跨境电商设计,亚马逊A+设计,独立站视觉,AIGC设计,3D渲染,电动滑板车设计,3D打印机设计">
+    <meta name="author" content="李欢">
+    <title>李欢 - 跨境电商视觉设计师 | AIGC+跨境场景设计赋能</title>
     <style>
         /* 全局重置+基础规范（参考苹果官网+花瓣网） */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #1d1d1f; /* 苹果深空灰 */
-            --secondary: #0071e3; /* 苹果蓝 */
+            --secondary: #0071e3; /* 苹果蓝 - 品牌主色 */
+            --secondary-light: #0080ff; /* 苹果蓝浅色调 */
             --light-gray: #f5f5f7;
             --mid-gray: #e8e8ed;
+            --placeholder-gray: #f0f0f5;
             --text-primary: #1d1d1f;
             --text-secondary: #6e6e73;
             --shadow-sm: 0 4px 20px rgba(0,0,0,0.05);
@@ -19,12 +24,18 @@
             --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
             --transition-base: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             --transition-fast: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition-slow: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft Yahei", sans-serif;
             background-color: #fff;
             color: var(--text-primary);
             line-height: 1.5;
+            /* 平滑滚动兼容 */
+            scroll-behavior: smooth;
+        }
+        /* 平滑滚动兼容补丁 */
+        html {
             scroll-behavior: smooth;
         }
         .container {
@@ -36,6 +47,13 @@
         .section {
             padding: 80px 0;
             position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         .section-title {
             font-size: 32px;
@@ -91,7 +109,7 @@
             transition: var(--transition-fast);
         }
         .contact-btn:hover {
-            background-color: #0077ed;
+            background-color: var(--secondary-light);
             transform: translateY(-1px);
         }
 
@@ -102,6 +120,8 @@
             text-align: center;
             background-color: var(--light-gray);
             margin-top: 64px;
+            opacity: 1;
+            transform: translateY(0);
         }
         .hero-avatar {
             width: 120px;
@@ -118,7 +138,7 @@
             object-fit: cover;
             display: block; /* 适配PNG透明底 */
         }
-        /* 简历下载按钮样式 */
+        /* 简历下载按钮样式 - 新增交互反馈 */
         .resume-btn-wrapper {
             margin: 16px 0;
         }
@@ -133,11 +153,31 @@
             display: inline-block;
             font-weight: 500;
             box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
         }
         .resume-btn:hover {
-            background-color: #0077ed;
+            background-color: var(--secondary-light);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
+        }
+        .resume-btn.downloading {
+            background-color: var(--secondary-light);
+            pointer-events: none;
+        }
+        .resume-btn.downloading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.2);
+            animation: downloadProgress 1.5s linear infinite;
+        }
+        @keyframes downloadProgress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         .hero-title {
             font-size: 40px;
@@ -162,10 +202,12 @@
             margin-bottom: 16px;
         }
 
-        /* 轮播区（全面屏+苹果级交互） */
+        /* 轮播区（全面屏+苹果级交互 - 修复拉伸问题） */
         .carousel-section {
             background-color: #fff;
             padding: 0;
+            opacity: 1;
+            transform: translateY(0);
         }
         .carousel {
             position: relative;
@@ -185,6 +227,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: var(--light-gray);
         }
         .carousel-item.active {
             opacity: 1;
@@ -195,6 +238,11 @@
             object-fit: contain; /* 完整展示，适配所有格式 */
             transition: transform 0.5s ease;
             display: block; /* 消除PNG底部空白 */
+            /* 修复拉伸问题 - 关键优化 */
+            width: auto;
+            height: auto;
+            max-width: 90%;
+            max-height: 90%;
         }
         .carousel-item:hover img {
             transform: scale(1.02);
@@ -333,7 +381,7 @@
             line-height: 1.6;
         }
 
-        /* 核心技能（小米级标签设计，居中） */
+        /* 核心技能（小米级标签设计，居中 - 统一品牌色） */
         .skills-section {
             background-color: #fff;
         }
@@ -357,7 +405,8 @@
             border: 1px solid transparent;
         }
         .skill-tag:hover {
-            background: linear-gradient(135deg, var(--secondary) 0%, #0080ff 100%);
+            /* 统一品牌色渐变 - 关键优化 */
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
             color: #fff;
             transform: translateY(-4px) scale(1.02);
             box-shadow: var(--shadow-md);
@@ -441,76 +490,145 @@
             }
         }
 
-        /* 花瓣风格智能画廊（自动加载4大类图片） */
+        /* 花瓣风格智能画廊（性能优化+交互升级） */
         .gallery-section {
             background-color: #fff;
             padding: 80px 0;
         }
+        /* 花瓣同款画廊网格 - 扩容至8列自适应 */
         .petal-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 花瓣网自适应网格 */
-            gap: 16px;
-            max-width: 1400px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 扩容：从220→180px，更多列 */
+            gap: 12px; /* 缩小间距，展示更多 */
+            max-width: 1600px; /* 加宽容器，容纳更多列 */
             margin: 0 auto;
             padding: 0 24px;
         }
+        /* 花瓣同款画廊项 - 交互升级 */
         .gallery-item {
             border-radius: 8px;
             overflow: hidden;
             box-shadow: var(--shadow-sm);
             cursor: pointer;
-            transition: var(--transition-base);
+            transition: var(--transition-slow); /* 慢动画更丝滑 */
             aspect-ratio: 1/1; /* 正方形小窗 */
+            position: relative;
+            background-color: var(--placeholder-gray);
         }
+        /* 花瓣同款hover效果 */
         .gallery-item:hover {
-            transform: scale(1.03);
+            transform: scale(1.05); /* 更大的缩放 */
             box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+        .gallery-item::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0);
+            transition: var(--transition-fast);
+        }
+        .gallery-item:hover::after {
+            background: rgba(0,0,0,0.03);
         }
         .gallery-img {
             width: 100%;
             height: 100%;
             object-fit: cover; /* 小窗裁剪展示 */
             display: block; /* 消除PNG底部空白 */
+            /* 原生懒加载 - 性能优化关键 */
+            loading: lazy;
+            /* 渐进式加载 */
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        /* 图片弹窗（查看完整图，适配所有格式） */
+        .gallery-img.loaded {
+            opacity: 1;
+        }
+        /* 图片加载中占位 - 花瓣同款 */
+        .gallery-item .loading-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--placeholder-gray);
+        }
+        .gallery-item .loading-placeholder::after {
+            content: "";
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--mid-gray);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: loading 1s linear infinite;
+        }
+        @keyframes loading {
+            to { transform: rotate(360deg); }
+        }
+        /* 图片弹窗（花瓣同款交互） */
         .img-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.9);
+            background-color: rgba(0,0,0,0.92); /* 更深的背景，花瓣同款 */
             z-index: 9999;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         .img-modal.active {
             display: flex;
+            opacity: 1;
         }
         .modal-content {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 95%; /* 更大的展示区域 */
+            max-height: 95%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .img-modal.active .modal-content {
+            transform: scale(1);
         }
         .modal-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain; /* 完整展示，不裁剪 */
             display: block; /* 适配PNG透明底 */
+            border-radius: 8px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
         }
         .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 30px;
+            position: fixed; /* 固定位置，花瓣同款 */
+            top: 30px;
+            right: 40px;
             color: #fff;
-            font-size: 40px;
-            font-weight: bold;
+            font-size: 48px; /* 更大的关闭按钮 */
+            font-weight: 300;
             cursor: pointer;
             transition: var(--transition-fast);
+            z-index: 10000;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
         .close-modal:hover {
             color: var(--secondary);
+            background-color: rgba(255,255,255,0.1);
         }
         /* 加载提示 */
         .gallery-loading {
@@ -519,16 +637,54 @@
             color: var(--text-secondary);
             padding: 40px 0;
         }
+        /* 画廊空状态 */
+        .gallery-empty {
+            text-align: center;
+            font-size: 18px;
+            color: var(--text-secondary);
+            padding: 60px 0;
+            line-height: 1.8;
+        }
+        .gallery-empty::before {
+            content: "📁";
+            font-size: 48px;
+            display: block;
+            margin-bottom: 16px;
+        }
         @media (max-width: 768px) {
             .petal-gallery {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 移动端更密 */
+                gap: 8px;
             }
             .close-modal {
-                font-size: 30px;
-                top: 15px;
+                font-size: 36px;
+                top: 20px;
                 right: 20px;
+                width: 40px;
+                height: 40px;
             }
+            .modal-content {
+                max-width: 98%;
+                max-height: 90%;
+            }
+        }
+
+        /* 自定义占位图样式 - 优化 */
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background-color: var(--placeholder-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .img-placeholder::before {
+            content: "🖼️";
+            font-size: 24px;
         }
 
         /* 页脚（居中） */
@@ -545,9 +701,14 @@
         .footer-contact {
             margin-bottom: 16px;
         }
+        .footer-contact qq {
+            display: block;
+            margin-top: 8px;
+        }
         .footer-copyright {
             font-size: 12px;
             color: rgba(255,255,255,0.5);
+            margin-top: 24px;
         }
     </style>
 </head>
@@ -564,11 +725,11 @@
     <section class="hero">
         <div class="container">
             <div class="hero-avatar">
-                <img src="avatar.jpg" alt="李欢-职业头像">
+                <img src="avatar.jpg" alt="李欢-职业头像" onerror="this.parentNode.innerHTML='<div class=img-placeholder>头像</div>'">
             </div>
             <!-- 简历下载按钮（一键下载，文件名严格为resume-lihuan.pdf） -->
             <div class="resume-btn-wrapper">
-                <a href="resume-lihuan.pdf" download class="resume-btn">下载我的简历</a>
+                <a href="resume-lihuan.pdf" download class="resume-btn" id="resumeBtn">下载我的简历</a>
             </div>
             <h1 class="hero-title">李欢</h1>
             <span class="hero-tag">8年跨境电商视觉设计经验</span>
@@ -580,13 +741,13 @@
     <section class="carousel-section">
         <div class="carousel">
             <div class="carousel-item active">
-                <img src="banner1.jpg" alt="精选作品：电动滑板车独立站Banner">
+                <img src="banner1.jpg" alt="精选作品：电动滑板车独立站Banner" onerror="this.parentNode.innerHTML='<div class=img-placeholder>轮播图1</div>'">
             </div>
             <div class="carousel-item">
-                <img src="banner2.jpg" alt="精选作品：3D打印机亚马逊A+页面">
+                <img src="banner2.jpg" alt="精选作品：3D打印机亚马逊A+页面" onerror="this.parentNode.innerHTML='<div class=img-placeholder>轮播图2</div>'">
             </div>
             <div class="carousel-item">
-                <img src="banner3.jpg" alt="精选作品：激光雕刻机独立站详情页">
+                <img src="banner3.jpg" alt="精选作品：激光雕刻机独立站详情页" onerror="this.parentNode.innerHTML='<div class=img-placeholder>轮播图3</div>'">
             </div>
             <button class="carousel-control prev">&lt;</button>
             <button class="carousel-control next">&gt;</button>
@@ -605,7 +766,7 @@
             <div class="advantages-grid">
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage1.png" alt="AIGC高效赋能"> <!-- 示例PNG格式 -->
+                        <img src="advantage1.png" alt="AIGC高效赋能" onerror="this.parentNode.innerHTML='<div class=img-placeholder>AIGC赋能</div>'"> <!-- 示例PNG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">AIGC高效赋能</h3>
@@ -614,7 +775,7 @@
                 </div>
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage2.jpg" alt="全栈设计硬实力"> <!-- 示例JPG格式 -->
+                        <img src="advantage2.jpg" alt="全栈设计硬实力" onerror="this.parentNode.innerHTML='<div class=img-placeholder>全栈设计</div>'"> <!-- 示例JPG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">全栈设计硬实力</h3>
@@ -623,7 +784,7 @@
                 </div>
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage3.png" alt="多领域设计驾驭"> <!-- 示例PNG格式 -->
+                        <img src="advantage3.png" alt="多领域设计驾驭" onerror="this.parentNode.innerHTML='<div class=img-placeholder>多领域设计</div>'"> <!-- 示例PNG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">多领域设计驾驭</h3>
@@ -632,7 +793,7 @@
                 </div>
                 <div class="advantage-card">
                     <div class="advantage-img" data-loading="加载中...">
-                        <img src="advantage4.jpg" alt="职业素养拉满"> <!-- 示例JPG格式 -->
+                        <img src="advantage4.jpg" alt="职业素养拉满" onerror="this.parentNode.innerHTML='<div class=img-placeholder>职业素养</div>'"> <!-- 示例JPG格式 -->
                     </div>
                     <div class="advantage-content">
                         <h3 class="advantage-title">职业素养拉满</h3>
@@ -668,7 +829,7 @@
                 <!-- 电动出行工具类（悬浮卡片+跳转） -->
                 <a href="electric.html" class="category-card">
                     <div class="category-img">
-                        <img src="electric_thumb.jpg" alt="电动出行工具类缩略图">
+                        <img src="electric_thumb.jpg" alt="电动出行工具类缩略图" onerror="this.parentNode.innerHTML='<div class=img-placeholder>电动类</div>'">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">电动出行工具类</h3>
@@ -678,7 +839,7 @@
                 <!-- 家居家电类（悬浮卡片+跳转） -->
                 <a href="home.html" class="category-card">
                     <div class="category-img">
-                        <img src="home_thumb.jpg" alt="家居家电类缩略图">
+                        <img src="home_thumb.jpg" alt="家居家电类缩略图" onerror="this.parentNode.innerHTML='<div class=img-placeholder>家居类</div>'">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">家居家电类</h3>
@@ -688,7 +849,7 @@
                 <!-- 3D打印&雕刻类（悬浮卡片+跳转） -->
                 <a href="3d.html" class="category-card">
                     <div class="category-img">
-                        <img src="3d_thumb.jpg" alt="3D打印&雕刻类缩略图">
+                        <img src="3d_thumb.jpg" alt="3D打印&雕刻类缩略图" onerror="this.parentNode.innerHTML='<div class=img-placeholder>3D类</div>'">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">3D打印&雕刻类</h3>
@@ -698,7 +859,7 @@
                 <!-- 3C数码类（悬浮卡片+跳转） -->
                 <a href="3c.html" class="category-card">
                     <div class="category-img">
-                        <img src="3c_thumb.jpg" alt="3C数码类缩略图">
+                        <img src="3c_thumb.jpg" alt="3C数码类缩略图" onerror="this.parentNode.innerHTML='<div class=img-placeholder>3C类</div>'">
                     </div>
                     <div class="category-content">
                         <h3 class="category-title">3C数码类</h3>
@@ -710,19 +871,24 @@
     </section>
 
     <!-- 智能画廊（自动加载4大类图片） -->
-    <section class="gallery-section">
+    <section class="section gallery-section">
         <h2 class="section-title">全部作品画廊</h2>
         <!-- 加载提示 -->
         <div class="gallery-loading" id="galleryLoading">正在加载作品图片...</div>
         <!-- 画廊容器（动态生成） -->
         <div class="petal-gallery" id="petalGallery"></div>
+        <!-- 空状态 -->
+        <div class="gallery-empty" id="galleryEmpty" style="display: none;">
+            暂无作品图片<br>
+            请按命名规则上传图片后刷新页面
+        </div>
     </section>
 
     <!-- 图片弹窗（查看完整图） -->
     <div class="img-modal" id="imgModal">
         <span class="close-modal" id="closeModal">&times;</span>
         <div class="modal-content">
-            <img src="" alt="完整作品图" class="modal-img" id="modalImg">
+            <img src="" alt="完整作品图" class="modal-img" id="modalImg" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmNSIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJjb250cm9sIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7nlLXlv4Mg5Zu+54mHPC90ZXh0Pjwvc3ZnPg=='">
         </div>
     </div>
 
@@ -741,8 +907,23 @@
         </div>
     </footer>
 
-    <!-- 完整无省略的JavaScript脚本 -->
+    <!-- 完整无省略的JavaScript脚本 - 全面优化 -->
     <script>
+        // ==================== 工具函数 - 新增 ====================
+        // 防抖函数
+        function debounce(func, wait = 100) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // 生成默认占位图（Base64）
+        function getPlaceholderImage() {
+            return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmNSIvPjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJjb250cm9sIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7nlLXlv4Mg5Zu+54mHPC90ZXh0Pjwvc3ZnPg==';
+        }
+
         // ==================== 1. 轮播功能（完整逻辑） ====================
         const carouselItems = document.querySelectorAll('.carousel-item');
         const carouselIndicators = document.querySelectorAll('.carousel-indicator');
@@ -808,7 +989,7 @@
         // 初始化轮播
         startSlideInterval();
 
-        // ==================== 2. 智能画廊（自动加载4大类图片） ====================
+        // ==================== 2. 智能画廊（性能优化+交互升级） ====================
         // 定义4大类图片前缀（按命名规则）
         const imageCategories = [
             { prefix: 'electric', name: '电动出行工具' },
@@ -819,19 +1000,34 @@
         // 支持的图片格式
         const imageFormats = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
         // 最大尝试数量（防止无限循环）
-        const maxImageNumber = 50;
+        const maxImageNumber = 100; // 扩容至100张
+        // 分批次加载（性能优化）
+        const batchSize = 20;
         // 画廊容器
         const galleryContainer = document.getElementById('petalGallery');
         const galleryLoading = document.getElementById('galleryLoading');
+        const galleryEmpty = document.getElementById('galleryEmpty');
         // 已加载的图片列表（避免重复）
         let loadedImages = [];
+        // 排序后的图片列表
+        let sortedImages = [];
 
-        // 检查图片是否存在
-        function checkImageExists(url) {
+        // 检查图片是否存在 - 优化超时处理
+        function checkImageExists(url, timeout = 3000) {
             return new Promise((resolve) => {
                 const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
+                const timer = setTimeout(() => resolve(false), timeout);
+                
+                img.onload = () => {
+                    clearTimeout(timer);
+                    resolve(true);
+                };
+                
+                img.onerror = () => {
+                    clearTimeout(timer);
+                    resolve(false);
+                };
+                
                 img.src = url;
             });
         }
@@ -839,10 +1035,10 @@
         // 生成图片描述
         function generateImageDescription(prefix, number, categoryName) {
             const descriptions = {
-                electric: [`KUGO LX10+电动滑板车`, `Eleglide T1ST电动自行车`, `FORDE Xtremer 2电动自行车`, `TOURU城市&郊区电动自行车`, `多功能电动自行车`],
-                home: [`ACGAM电动升降桌`, `JIGOO除螨仪`, `人体工学办公椅`],
-                3d: [`MECPOW M1桌面激光雕刻机`, `工业级3D打印机`, `MECPOW X1双激光雕刻机`, `3D打印耗材`],
-                3c: [`迷你PC`]
+                electric: [`KUGO LX10+电动滑板车`, `Eleglide T1ST电动自行车`, `FORDE Xtremer 2电动自行车`, `TOURU城市&郊区电动自行车`, `多功能电动自行车`, `电动滑板车亚马逊主图`, `电动自行车详情页`, `跨境电动产品A+页面`, `电动工具社媒海报`, `电动滑板车包装设计`],
+                home: [`ACGAM电动升降桌`, `JIGOO除螨仪`, `人体工学办公椅`, `家居产品亚马逊主图`, `升降桌详情页设计`, `除螨仪A+页面`, `办公家具跨境视觉`, `智能家居产品设计`],
+                3d: [`MECPOW M1桌面激光雕刻机`, `工业级3D打印机`, `MECPOW X1双激光雕刻机`, `3D打印耗材`, `激光雕刻机详情页`, `3D打印机亚马逊A+`, `工业产品视觉设计`, `3D渲染作品`],
+                3c: [`迷你PC`, `3C数码产品主图`, `数码产品详情页`, `跨境3C视觉设计`, `迷你PC亚马逊A+页面`]
             };
             // 如果有预设描述则使用，否则生成通用描述
             if (descriptions[prefix] && descriptions[prefix][number - 1]) {
@@ -852,8 +1048,49 @@
             }
         }
 
+        // 创建画廊项 - 优化加载状态
+        function createGalleryItem(imageUrl, imageDesc) {
+            // 创建画廊项
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            galleryItem.setAttribute('data-img', imageUrl);
+            
+            // 创建加载占位
+            const loadingPlaceholder = document.createElement('div');
+            loadingPlaceholder.className = 'loading-placeholder';
+            galleryItem.appendChild(loadingPlaceholder);
+            
+            // 创建图片元素
+            const galleryImg = document.createElement('img');
+            galleryImg.className = 'gallery-img';
+            galleryImg.src = imageUrl;
+            galleryImg.alt = imageDesc;
+            galleryImg.loading = 'lazy'; // 原生懒加载
+            
+            // 图片加载完成
+            galleryImg.onload = () => {
+                loadingPlaceholder.remove();
+                galleryImg.classList.add('loaded');
+            };
+            
+            // 图片加载失败处理
+            galleryImg.onerror = () => {
+                loadingPlaceholder.remove();
+                galleryImg.src = getPlaceholderImage();
+                galleryImg.alt = '图片加载失败';
+                galleryImg.classList.add('loaded');
+            };
+            
+            // 添加到容器
+            galleryItem.appendChild(galleryImg);
+            
+            return galleryItem;
+        }
+
         // 加载指定分类的图片
         async function loadCategoryImages(category) {
+            const categoryImages = [];
+            
             for (let i = 1; i <= maxImageNumber; i++) {
                 // 尝试所有支持的格式
                 for (const format of imageFormats) {
@@ -861,60 +1098,85 @@
                     // 检查图片是否存在
                     const exists = await checkImageExists(imageUrl);
                     if (exists && !loadedImages.includes(imageUrl)) {
-                        // 图片存在且未加载过，添加到画廊
+                        // 图片存在且未加载过，添加到列表
                         loadedImages.push(imageUrl);
                         const imageDesc = generateImageDescription(category.prefix, i, category.name);
-                        
-                        // 创建画廊项
-                        const galleryItem = document.createElement('div');
-                        galleryItem.className = 'gallery-item';
-                        galleryItem.setAttribute('data-img', imageUrl);
-                        
-                        // 创建图片元素
-                        const galleryImg = document.createElement('img');
-                        galleryImg.className = 'gallery-img';
-                        galleryImg.src = imageUrl;
-                        galleryImg.alt = imageDesc;
-                        // 图片加载失败处理
-                        galleryImg.addEventListener('error', () => {
-                            galleryImg.src = 'placeholder.png';
-                            galleryImg.alt = '图片加载失败';
+                        categoryImages.push({
+                            url: imageUrl,
+                            desc: imageDesc,
+                            category: category.prefix,
+                            number: i
                         });
-                        
-                        // 添加到容器
-                        galleryItem.appendChild(galleryImg);
-                        galleryContainer.appendChild(galleryItem);
-                        
                         // 跳出格式循环，继续下一个数字
                         break;
                     }
                 }
             }
+            
+            return categoryImages;
+        }
+
+        // 分批次渲染图片（性能优化）
+        function renderImagesInBatches(images, batchSize = 20) {
+            let index = 0;
+            
+            function renderBatch() {
+                const batch = images.slice(index, index + batchSize);
+                if (batch.length === 0) {
+                    // 全部渲染完成
+                    galleryLoading.style.display = 'none';
+                    // 初始化画廊弹窗事件
+                    initGalleryModal();
+                    return;
+                }
+                
+                // 渲染当前批次
+                batch.forEach(img => {
+                    const galleryItem = createGalleryItem(img.url, img.desc);
+                    galleryContainer.appendChild(galleryItem);
+                });
+                
+                // 继续下一批次
+                index += batchSize;
+                setTimeout(renderBatch, 100); // 延迟渲染，避免阻塞主线程
+            }
+            
+            // 开始渲染
+            renderBatch();
         }
 
         // 加载所有分类的图片
         async function loadAllGalleryImages() {
             galleryLoading.textContent = '正在加载作品图片...';
+            sortedImages = [];
             
             // 按分类加载图片
             for (const category of imageCategories) {
-                await loadCategoryImages(category);
+                const categoryImages = await loadCategoryImages(category);
+                sortedImages = sortedImages.concat(categoryImages);
             }
+            
+            // 按分类+数字排序
+            sortedImages.sort((a, b) => {
+                if (a.category === b.category) {
+                    return a.number - b.number;
+                }
+                return imageCategories.findIndex(c => c.prefix === a.category) - imageCategories.findIndex(c => c.prefix === b.category);
+            });
             
             // 隐藏加载提示
             galleryLoading.style.display = 'none';
             
             // 如果没有加载到任何图片
-            if (loadedImages.length === 0) {
-                galleryLoading.textContent = '暂无作品图片，请上传图片后刷新页面';
-                galleryLoading.style.display = 'block';
+            if (sortedImages.length === 0) {
+                galleryEmpty.style.display = 'block';
             } else {
-                // 初始化画廊弹窗事件
-                initGalleryModal();
+                // 分批次渲染图片
+                renderImagesInBatches(sortedImages, batchSize);
             }
         }
 
-        // ==================== 3. 画廊弹窗功能 ====================
+        // ==================== 3. 画廊弹窗功能（花瓣交互升级） ====================
         function initGalleryModal() {
             const galleryItems = document.querySelectorAll('.gallery-item');
             const imgModal = document.getElementById('imgModal');
@@ -923,71 +1185,114 @@
 
             // 点击小图打开弹窗
             galleryItems.forEach(item => {
-                item.addEventListener('click', () => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
                     const imgSrc = item.getAttribute('data-img');
-                    modalImg.src = imgSrc;
-                    modalImg.alt = item.querySelector('.gallery-img').alt;
+                    const imgAlt = item.querySelector('.gallery-img').alt;
+                    
+                    // 重置弹窗图片状态
+                    modalImg.src = '';
+                    modalImg.alt = '';
+                    
+                    // 显示加载状态
+                    modalImg.src = getPlaceholderImage();
+                    
+                    // 加载大图
+                    setTimeout(() => {
+                        modalImg.src = imgSrc;
+                        modalImg.alt = imgAlt;
+                    }, 50);
+                    
+                    // 显示弹窗
                     imgModal.classList.add('active');
                     // 禁止页面滚动
                     document.body.style.overflow = 'hidden';
+                    document.documentElement.style.overflow = 'hidden';
                 });
             });
 
-            // 点击关闭按钮关闭弹窗
-            closeModal.addEventListener('click', () => {
+            // 关闭弹窗函数
+            function closeModalFunc() {
                 imgModal.classList.remove('active');
                 // 恢复页面滚动
                 document.body.style.overflow = 'auto';
-            });
+                document.documentElement.style.overflow = 'auto';
+            }
+
+            // 点击关闭按钮关闭弹窗
+            closeModal.addEventListener('click', closeModalFunc);
 
             // 点击弹窗外区域关闭弹窗
             imgModal.addEventListener('click', (e) => {
                 if (e.target === imgModal) {
-                    imgModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
+                    closeModalFunc();
                 }
             });
 
             // 按ESC键关闭弹窗
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && imgModal.classList.contains('active')) {
-                    imgModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
+                    closeModalFunc();
+                }
+            });
+
+            // 移动端手势支持（滑动关闭）
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            imgModal.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            imgModal.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+                
+                // 滑动距离超过50px则关闭
+                if (Math.abs(diffX) > 50 || Math.abs(diffY) > 50) {
+                    closeModalFunc();
                 }
             });
         }
 
-        // ==================== 4. 滚动渐显效果 ====================
-        function revealOnScroll() {
+        // ==================== 4. 滚动渐显效果（优化） ====================
+        const revealOnScroll = debounce(function() {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => {
                 const sectionTop = section.getBoundingClientRect().top;
                 const windowHeight = window.innerHeight;
                 // 当元素进入视口85%时显示
                 if (sectionTop < windowHeight * 0.85) {
-                    section.style.opacity = '1';
-                    section.style.transform = 'translateY(0)';
+                    section.classList.add('visible');
                 }
             });
-        }
+        }, 50);
 
-        // 初始化渐显样式
-        document.querySelectorAll('.section').forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        });
-
-        // ==================== 5. 图片加载失败处理 ====================
-        function setupImageErrorHandling() {
-            document.querySelectorAll('img').forEach(img => {
-                img.addEventListener('error', () => {
-                    // 图片加载失败时显示占位图
-                    if (!img.src.includes('placeholder.png')) {
-                        img.src = 'placeholder.png';
-                        img.alt = '图片加载失败';
-                    }
-                });
+        // ==================== 5. 简历下载交互反馈（新增） ====================
+        const resumeBtn = document.getElementById('resumeBtn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', function(e) {
+                // 添加下载中状态
+                this.classList.add('downloading');
+                this.textContent = '下载中...';
+                
+                // 3秒后恢复
+                setTimeout(() => {
+                    this.classList.remove('downloading');
+                    this.textContent = '下载我的简历';
+                }, 3000);
+            });
+            
+            // 下载失败处理
+            resumeBtn.addEventListener('error', function() {
+                this.classList.remove('downloading');
+                this.textContent = '下载失败，请重试';
+                setTimeout(() => {
+                    this.textContent = '下载我的简历';
+                }, 3000);
             });
         }
 
@@ -997,11 +1302,17 @@
             revealOnScroll();
             window.addEventListener('scroll', revealOnScroll);
             
-            // 设置图片加载失败处理
-            setupImageErrorHandling();
+            // 加载画廊图片（异步+非阻塞）
+            setTimeout(async () => {
+                await loadAllGalleryImages();
+            }, 500);
             
-            // 加载画廊图片
-            await loadAllGalleryImages();
+            // 平滑滚动兼容
+            if (!('scrollBehavior' in document.documentElement.style)) {
+                import('https://cdn.jsdelivr.net/npm/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js').then(() => {
+                    smoothscroll.polyfill();
+                });
+            }
         });
     </script>
 </body>
